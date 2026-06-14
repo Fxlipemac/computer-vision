@@ -1,0 +1,41 @@
+# Environments
+.venv/
+env/
+venv/
+virtualenv/
+*.env
+
+# Datasets
+dataset/
+datasets/
+construction-safety-2/
+*/test/
+*/train/
+*/valid/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML artifacts
+runs/
+weights/
+*.pt
+*.pth
+*.onnx
+
+# Logs
+logs/
+*.log
+
+# Config local
+*.local
