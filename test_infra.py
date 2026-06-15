@@ -2,13 +2,15 @@ import cv2
 import os
 import time
 from flask import Flask, Response
+from dotenv import load_dotenv
 
-# Scan for available ports
-def scan_port(max_ports=5):
+load_dotenv() # load variables .env
+
+def scan_port(max_ports=5): # Scan for available ports
     active_ports = []
 
     for port in range(max_ports):
-        cap = cv2.VideoCapture(port, cv2.CAP_V4L2)
+        cap = cv2.VideoCapture(port)
 
         if cap.isOpened():
             success, frame = cap.read()
@@ -18,20 +20,18 @@ def scan_port(max_ports=5):
         cap.release()
     return active_ports
 
-# take snapshots of available ports
-def take_snapshots(active_ports):
+def take_snapshots(active_ports): # take snapshots of available ports
     output_dir = "snapshots"
     os.makedirs(output_dir, exist_ok=True)
     for port in active_ports:
-        cap = cv2.VideoCapture(port, cv2.CAP_V4L2)
+        cap = cv2.VideoCapture(port)
         success, frame = cap.read()
         if success:
             cv2.imwrite(os.path.join(output_dir, f"camera_port_{port}.jpg"), frame)
         cap.release()
 
-# web stream generator - serve video streams to the browser
-def generate_frames(port):
-    cap = cv2.VideoCapture(port, cv2.CAP_V4L2)
+def generate_frames(port): # web stream generator - serve video streams to the browser
+    cap = cv2.VideoCapture(port)
 
     while True:
         success, frame = cap.read()
@@ -41,8 +41,7 @@ def generate_frames(port):
             yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         else: break
 
-# web server controller
-def start_server(active_ports):
+def start_server(active_ports): # web server controller
     app = Flask(__name__)
     @app.route('/video/<int:port>')
     def video_feed(port):
@@ -53,10 +52,10 @@ def start_server(active_ports):
         for port in active_ports:
             html += f"<div><h3>Port {port}</h3><img src='/video/{port}' width='640'></div>"
         return html
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host='0.0.0.0', port=port)
 
-# execute code
-if __name__ == "__main__":
+if __name__ == "__main__": # execute code
     active = scan_port()
 
     if active:
