@@ -39,3 +39,6 @@ logs/
 
 # Config local
 *.local
+
+# Testing outputs
+snapshots/
